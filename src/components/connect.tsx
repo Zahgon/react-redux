@@ -46,11 +46,7 @@ const NO_SUBSCRIPTION_ARRAY = [null, null]
 // Attempts to stringify whatever not-really-a-component value we were given
 // for logging in an error message
 const stringifyComponent = (Comp: unknown) => {
-  try {
-    return JSON.stringify(Comp)
-  } catch (err) {
-    return String(Comp)
-  }
+    throw new Error("STUB");
 }
 
 type EffectFunc = (...args: any[]) => void | ReturnType<React.EffectCallback>
@@ -64,7 +60,7 @@ function useIsomorphicLayoutEffectWithArgs(
   effectArgs: any[],
   dependencies?: React.DependencyList,
 ) {
-  useIsomorphicLayoutEffect(() => effectFunc(...effectArgs), dependencies)
+    throw new Error("STUB");
 }
 
 // Effect callback, extracted: assign the latest props values to refs for later usage
@@ -77,15 +73,7 @@ function captureWrapperProps(
   childPropsFromStoreUpdate: React.MutableRefObject<unknown>,
   notifyNestedSubs: () => void,
 ) {
-  // We want to capture the wrapper props and child props we used for later comparisons
-  lastWrapperProps.current = wrapperProps
-  renderIsScheduled.current = false
-
-  // If the render was from a store update, clear out that reference and cascade the subscriber update
-  if (childPropsFromStoreUpdate.current) {
-    childPropsFromStoreUpdate.current = null
-    notifyNestedSubs()
-  }
+    throw new Error("STUB");
 }
 
 // Effect callback, extracted: subscribe to the Redux store or nearest connected ancestor,
@@ -106,7 +94,9 @@ function subscribeUpdates(
   displayName: string,
 ) {
   // If we're not subscribed to the store, nothing to do here
-  if (!shouldHandleStateChanges) return () => {}
+  if (!shouldHandleStateChanges) return () => {
+      throw new Error("STUB");
+  }
 
   // Capture values for checking if and when this component unmounts
   let didUnsubscribe = false
@@ -176,25 +166,14 @@ function subscribeUpdates(
   checkForUpdates()
 
   const unsubscribeWrapper = () => {
-    didUnsubscribe = true
-    subscription.tryUnsubscribe()
-    subscription.onStateChange = null
-
-    if (lastThrownError) {
-      // It's possible that we caught an error due to a bad mapState function, but the
-      // parent re-rendered without this component and we're about to unmount.
-      // This shouldn't happen as long as we do top-down subscriptions correctly, but
-      // if we ever do those wrong, this throw will surface the error in our tests.
-      // In that case, throw the error from here so it doesn't get lost.
-      throw lastThrownError
-    }
+      throw new Error("STUB");
   }
 
   return unsubscribeWrapper
 }
 
 // Reducer initial state creation for our update reducer
-const initStateUpdates = () => EMPTY_ARRAY
+const initStateUpdates = () => { throw new Error("STUB"); }
 
 export interface ConnectProps {
   /** A custom Context instance that the component can use to access the store from an alternate Provider using that same Context instance */
@@ -208,7 +187,7 @@ interface InternalConnectProps extends ConnectProps {
 }
 
 function strictEqual(a: unknown, b: unknown) {
-  return a === b
+    throw new Error("STUB");
 }
 
 /**
@@ -480,355 +459,7 @@ function _connect<
     context = ReactReduxContext,
   }: ConnectOptions<unknown, unknown, unknown, unknown> = {},
 ): unknown {
-  if (process.env.NODE_ENV !== 'production') {
-    if (pure !== undefined && !hasWarnedAboutDeprecatedPureOption) {
-      hasWarnedAboutDeprecatedPureOption = true
-      warning(
-        'The `pure` option has been removed. `connect` is now always a "pure/memoized" component',
-      )
-    }
-  }
-
-  const Context = context
-
-  const initMapStateToProps = mapStateToPropsFactory(mapStateToProps)
-  const initMapDispatchToProps = mapDispatchToPropsFactory(mapDispatchToProps)
-  const initMergeProps = mergePropsFactory(mergeProps)
-
-  const shouldHandleStateChanges = Boolean(mapStateToProps)
-
-  const wrapWithConnect = <TProps,>(
-    WrappedComponent: ComponentType<TProps>,
-  ) => {
-    type WrappedComponentProps = TProps &
-      ConnectPropsMaybeWithoutContext<TProps>
-
-    if (process.env.NODE_ENV !== 'production') {
-      const isValid = /*#__PURE__*/ isValidElementType(WrappedComponent)
-      if (!isValid)
-        throw new Error(
-          `You must pass a component to the function returned by connect. Instead received ${stringifyComponent(
-            WrappedComponent,
-          )}`,
-        )
-    }
-
-    const wrappedComponentName =
-      WrappedComponent.displayName || WrappedComponent.name || 'Component'
-
-    const displayName = `Connect(${wrappedComponentName})`
-
-    const selectorFactoryOptions: SelectorFactoryOptions<
-      any,
-      any,
-      any,
-      any,
-      State
-    > = {
-      shouldHandleStateChanges,
-      displayName,
-      wrappedComponentName,
-      WrappedComponent,
-      // @ts-ignore
-      initMapStateToProps,
-      initMapDispatchToProps,
-      initMergeProps,
-      areStatesEqual,
-      areStatePropsEqual,
-      areOwnPropsEqual,
-      areMergedPropsEqual,
-    }
-
-    function ConnectFunction<TOwnProps>(
-      props: InternalConnectProps & TOwnProps,
-    ) {
-      const [propsContext, reactReduxForwardedRef, wrapperProps] =
-        React.useMemo(() => {
-          // Distinguish between actual "data" props that were passed to the wrapper component,
-          // and values needed to control behavior (forwarded refs, alternate context instances).
-          // To maintain the wrapperProps object reference, memoize this destructuring.
-          const { reactReduxForwardedRef, ...wrapperProps } = props
-          return [props.context, reactReduxForwardedRef, wrapperProps]
-        }, [props])
-
-      const ContextToUse: ReactReduxContextInstance = React.useMemo(() => {
-        // Users may optionally pass in a custom context instance to use instead of our ReactReduxContext.
-        // Memoize the check that determines which context instance we should use.
-        let ResultContext = Context
-        if (propsContext?.Consumer) {
-          if (process.env.NODE_ENV !== 'production') {
-            const isValid = /*#__PURE__*/ isContextConsumer(
-              // @ts-ignore
-              <propsContext.Consumer />,
-            )
-            if (!isValid) {
-              throw new Error(
-                'You must pass a valid React context consumer as `props.context`',
-              )
-            }
-            ResultContext = propsContext
-          }
-        }
-        return ResultContext
-      }, [propsContext, Context])
-
-      // Retrieve the store and ancestor subscription via context, if available
-      const contextValue = React.useContext(ContextToUse)
-
-      // The store _must_ exist as either a prop or in context.
-      // We'll check to see if it _looks_ like a Redux store first.
-      // This allows us to pass through a `store` prop that is just a plain value.
-      const didStoreComeFromProps =
-        Boolean(props.store) &&
-        Boolean(props.store!.getState) &&
-        Boolean(props.store!.dispatch)
-      const didStoreComeFromContext =
-        Boolean(contextValue) && Boolean(contextValue!.store)
-
-      if (
-        process.env.NODE_ENV !== 'production' &&
-        !didStoreComeFromProps &&
-        !didStoreComeFromContext
-      ) {
-        throw new Error(
-          `Could not find "store" in the context of ` +
-            `"${displayName}". Either wrap the root component in a <Provider>, ` +
-            `or pass a custom React context provider to <Provider> and the corresponding ` +
-            `React context consumer to ${displayName} in connect options.`,
-        )
-      }
-
-      // Based on the previous check, one of these must be true
-      const store: Store = didStoreComeFromProps
-        ? props.store!
-        : contextValue!.store
-
-      const getServerState = didStoreComeFromContext
-        ? contextValue!.getServerState
-        : store.getState
-
-      const childPropsSelector = React.useMemo(() => {
-        // The child props selector needs the store reference as an input.
-        // Re-create this selector whenever the store changes.
-        return defaultSelectorFactory(store.dispatch, selectorFactoryOptions)
-      }, [store])
-
-      const [subscription, notifyNestedSubs] = React.useMemo(() => {
-        if (!shouldHandleStateChanges) return NO_SUBSCRIPTION_ARRAY
-
-        // This Subscription's source should match where store came from: props vs. context. A component
-        // connected to the store via props shouldn't use subscription from context, or vice versa.
-        const subscription = createSubscription(
-          store,
-          didStoreComeFromProps ? undefined : contextValue!.subscription,
-        )
-
-        // `notifyNestedSubs` is duplicated to handle the case where the component is unmounted in
-        // the middle of the notification loop, where `subscription` will then be null. This can
-        // probably be avoided if Subscription's listeners logic is changed to not call listeners
-        // that have been unsubscribed in the  middle of the notification loop.
-        const notifyNestedSubs =
-          subscription.notifyNestedSubs.bind(subscription)
-
-        return [subscription, notifyNestedSubs]
-      }, [store, didStoreComeFromProps, contextValue])
-
-      // Determine what {store, subscription} value should be put into nested context, if necessary,
-      // and memoize that value to avoid unnecessary context updates.
-      const overriddenContextValue = React.useMemo(() => {
-        if (didStoreComeFromProps) {
-          // This component is directly subscribed to a store from props.
-          // We don't want descendants reading from this store - pass down whatever
-          // the existing context value is from the nearest connected ancestor.
-          return contextValue!
-        }
-
-        // Otherwise, put this component's subscription instance into context, so that
-        // connected descendants won't update until after this component is done
-        return {
-          ...contextValue,
-          subscription,
-        } as ReactReduxContextValue
-      }, [didStoreComeFromProps, contextValue, subscription])
-
-      // Set up refs to coordinate values between the subscription effect and the render logic
-      const lastChildProps = React.useRef<unknown>(undefined)
-      const lastWrapperProps = React.useRef(wrapperProps)
-      const childPropsFromStoreUpdate = React.useRef<unknown>(undefined)
-      const renderIsScheduled = React.useRef(false)
-      const isMounted = React.useRef(false)
-
-      // TODO: Change this to `React.useRef<Error>(undefined)` after upgrading to React 19.
-      /**
-       * @todo Change this to `React.useRef<Error>(undefined)` after upgrading to React 19.
-       */
-      const latestSubscriptionCallbackError = React.useRef<Error | undefined>(
-        undefined,
-      )
-
-      useIsomorphicLayoutEffect(() => {
-        isMounted.current = true
-        return () => {
-          isMounted.current = false
-        }
-      }, [])
-
-      const actualChildPropsSelector = React.useMemo(() => {
-        const selector = () => {
-          // Tricky logic here:
-          // - This render may have been triggered by a Redux store update that produced new child props
-          // - However, we may have gotten new wrapper props after that
-          // If we have new child props, and the same wrapper props, we know we should use the new child props as-is.
-          // But, if we have new wrapper props, those might change the child props, so we have to recalculate things.
-          // So, we'll use the child props from store update only if the wrapper props are the same as last time.
-          if (
-            childPropsFromStoreUpdate.current &&
-            wrapperProps === lastWrapperProps.current
-          ) {
-            return childPropsFromStoreUpdate.current
-          }
-
-          // TODO We're reading the store directly in render() here. Bad idea?
-          // This will likely cause Bad Things (TM) to happen in Concurrent Mode.
-          // Note that we do this because on renders _not_ caused by store updates, we need the latest store state
-          // to determine what the child props should be.
-          return childPropsSelector(store.getState(), wrapperProps)
-        }
-        return selector
-      }, [store, wrapperProps])
-
-      // We need this to execute synchronously every time we re-render. However, React warns
-      // about useLayoutEffect in SSR, so we try to detect environment and fall back to
-      // just useEffect instead to avoid the warning, since neither will run anyway.
-
-      const subscribeForReact = React.useMemo(() => {
-        const subscribe = (reactListener: () => void) => {
-          if (!subscription) {
-            return () => {}
-          }
-
-          return subscribeUpdates(
-            shouldHandleStateChanges,
-            store,
-            subscription,
-            // @ts-ignore
-            childPropsSelector,
-            lastWrapperProps,
-            lastChildProps,
-            renderIsScheduled,
-            isMounted,
-            childPropsFromStoreUpdate,
-            notifyNestedSubs,
-            reactListener,
-            displayName,
-          )
-        }
-
-        return subscribe
-      }, [subscription])
-
-      useIsomorphicLayoutEffectWithArgs(captureWrapperProps, [
-        lastWrapperProps,
-        lastChildProps,
-        renderIsScheduled,
-        wrapperProps,
-        childPropsFromStoreUpdate,
-        notifyNestedSubs,
-      ])
-
-      let actualChildProps: Record<string, unknown>
-
-      try {
-        actualChildProps = React.useSyncExternalStore(
-          // TODO We're passing through a big wrapper that does a bunch of extra side effects besides subscribing
-          subscribeForReact,
-          // TODO This is incredibly hacky. We've already processed the store update and calculated new child props,
-          // TODO and we're just passing that through so it triggers a re-render for us rather than relying on `uSES`.
-          actualChildPropsSelector,
-          getServerState
-            ? () => childPropsSelector(getServerState(), wrapperProps)
-            : actualChildPropsSelector,
-        )
-      } catch (err) {
-        if (latestSubscriptionCallbackError.current) {
-          // eslint-disable-next-line no-extra-semi
-          ;(err as Error).message +=
-            `\nThe error may be correlated with this previous error:\n${latestSubscriptionCallbackError.current.stack}\n\n`
-        }
-
-        throw err
-      }
-
-      useIsomorphicLayoutEffect(() => {
-        latestSubscriptionCallbackError.current = undefined
-        childPropsFromStoreUpdate.current = undefined
-        lastChildProps.current = actualChildProps
-      })
-
-      // Now that all that's done, we can finally try to actually render the child component.
-      // We memoize the elements for the rendered child component as an optimization.
-      const renderedWrappedComponent = React.useMemo(() => {
-        return (
-          // @ts-ignore
-          <WrappedComponent
-            {...actualChildProps}
-            ref={reactReduxForwardedRef}
-          />
-        )
-      }, [reactReduxForwardedRef, WrappedComponent, actualChildProps])
-
-      // If React sees the exact same element reference as last time, it bails out of re-rendering
-      // that child, same as if it was wrapped in React.memo() or returned false from shouldComponentUpdate.
-      const renderedChild = React.useMemo(() => {
-        if (shouldHandleStateChanges) {
-          // If this component is subscribed to store updates, we need to pass its own
-          // subscription instance down to our descendants. That means rendering the same
-          // Context instance, and putting a different value into the context.
-          return (
-            <ContextToUse.Provider value={overriddenContextValue}>
-              {renderedWrappedComponent}
-            </ContextToUse.Provider>
-          )
-        }
-
-        return renderedWrappedComponent
-      }, [ContextToUse, renderedWrappedComponent, overriddenContextValue])
-
-      return renderedChild
-    }
-
-    const _Connect = React.memo(ConnectFunction)
-
-    type ConnectedWrapperComponent = typeof _Connect & {
-      WrappedComponent: typeof WrappedComponent
-    }
-
-    // Add a hacky cast to get the right output type
-    const Connect = _Connect as unknown as ConnectedComponent<
-      typeof WrappedComponent,
-      WrappedComponentProps
-    >
-    Connect.WrappedComponent = WrappedComponent
-    Connect.displayName = ConnectFunction.displayName = displayName
-
-    if (forwardRef) {
-      const _forwarded = React.forwardRef(
-        function forwardConnectRef(props, ref) {
-          // @ts-ignore
-          return <Connect {...props} reactReduxForwardedRef={ref} />
-        },
-      )
-
-      const forwarded = _forwarded as ConnectedWrapperComponent
-      forwarded.displayName = displayName
-      forwarded.WrappedComponent = WrappedComponent
-      return /*#__PURE__*/ hoistStatics(forwarded, WrappedComponent)
-    }
-
-    return /*#__PURE__*/ hoistStatics(Connect, WrappedComponent)
-  }
-
-  return wrapWithConnect
+    throw new Error("STUB");
 }
 
 /**

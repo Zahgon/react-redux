@@ -60,41 +60,13 @@ function Provider<A extends Action<string> = UnknownAction, S = unknown>(
   const { children, context, serverState, store } = providerProps
 
   const contextValue = React.useMemo(() => {
-    const subscription = createSubscription(store)
-
-    const baseContextValue = {
-      store,
-      subscription,
-      getServerState: serverState ? () => serverState : undefined,
-    }
-
-    if (process.env.NODE_ENV === 'production') {
-      return baseContextValue
-    } else {
-      const { identityFunctionCheck = 'once', stabilityCheck = 'once' } =
-        providerProps
-
-      return /* @__PURE__ */ Object.assign(baseContextValue, {
-        stabilityCheck,
-        identityFunctionCheck,
-      })
-    }
+      throw new Error("STUB");
   }, [store, serverState])
 
-  const previousState = React.useMemo(() => store.getState(), [store])
+  const previousState = React.useMemo(() => { throw new Error("STUB"); }, [store])
 
   useIsomorphicLayoutEffect(() => {
-    const { subscription } = contextValue
-    subscription.onStateChange = subscription.notifyNestedSubs
-    subscription.trySubscribe()
-
-    if (previousState !== store.getState()) {
-      subscription.notifyNestedSubs()
-    }
-    return () => {
-      subscription.tryUnsubscribe()
-      subscription.onStateChange = undefined
-    }
+      throw new Error("STUB");
   }, [contextValue, previousState])
 
   const Context = context || ReactReduxContext

@@ -116,7 +116,7 @@ export interface UseSelector<StateType = unknown> {
   >() => UseSelector<OverrideStateType>
 }
 
-const refEquality: EqualityFn<any> = (a, b) => a === b
+const refEquality: EqualityFn<any> = (a, b) => { throw new Error("STUB"); }
 
 /**
  * Hook factory, which creates a `useSelector` hook bound to a given context.
@@ -168,74 +168,8 @@ export function createSelectorHook(
     const wrappedSelector = React.useCallback<typeof selector>(
       {
         [selector.name](state: TState) {
-          const selected = selector(state)
-          if (process.env.NODE_ENV !== 'production') {
-            const { devModeChecks = {} } =
-              typeof equalityFnOrOptions === 'function'
-                ? {}
-                : equalityFnOrOptions
-            const { identityFunctionCheck, stabilityCheck } = reduxContext
-            const {
-              identityFunctionCheck: finalIdentityFunctionCheck,
-              stabilityCheck: finalStabilityCheck,
-            } = {
-              stabilityCheck,
-              identityFunctionCheck,
-              ...devModeChecks,
-            }
-            if (
-              finalStabilityCheck === 'always' ||
-              (finalStabilityCheck === 'once' && firstRun.current)
-            ) {
-              const toCompare = selector(state)
-              if (!equalityFn(selected, toCompare)) {
-                let stack: string | undefined = undefined
-                try {
-                  throw new Error()
-                } catch (e) {
-                  // eslint-disable-next-line no-extra-semi
-                  ;({ stack } = e as Error)
-                }
-                console.warn(
-                  'Selector ' +
-                    (selector.name || 'unknown') +
-                    ' returned a different result when called with the same parameters. This can lead to unnecessary rerenders.' +
-                    '\nSelectors that return a new reference (such as an object or an array) should be memoized: https://redux.js.org/usage/deriving-data-selectors#optimizing-selectors-with-memoization',
-                  {
-                    state,
-                    selected,
-                    selected2: toCompare,
-                    stack,
-                  },
-                )
-              }
-            }
-            if (
-              finalIdentityFunctionCheck === 'always' ||
-              (finalIdentityFunctionCheck === 'once' && firstRun.current)
-            ) {
-              // @ts-ignore
-              if (selected === state) {
-                let stack: string | undefined = undefined
-                try {
-                  throw new Error()
-                } catch (e) {
-                  // eslint-disable-next-line no-extra-semi
-                  ;({ stack } = e as Error)
-                }
-                console.warn(
-                  'Selector ' +
-                    (selector.name || 'unknown') +
-                    ' returned the root state when called. This can lead to unnecessary rerenders.' +
-                    '\nSelectors that return the entire state are almost certainly a mistake, as they will cause a rerender whenever *anything* in state changes.',
-                  { stack },
-                )
-              }
-            }
-            if (firstRun.current) firstRun.current = false
-          }
-          return selected
-        },
+              throw new Error("STUB");
+          },
       }[selector.name],
       [selector],
     )
@@ -254,7 +188,7 @@ export function createSelectorHook(
   }
 
   Object.assign(useSelector, {
-    withTypes: () => useSelector,
+    withTypes: () => { throw new Error("STUB"); },
   })
 
   return useSelector as UseSelector

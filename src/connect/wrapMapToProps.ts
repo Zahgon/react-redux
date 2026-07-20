@@ -28,15 +28,7 @@ export function wrapMapToPropsConstant(
     | ActionCreatorsMapObject
     | ActionCreator<any>,
 ) {
-  return function initConstantSelector(dispatch: Dispatch) {
-    const constant = getConstant(dispatch)
-
-    function constantSelector() {
-      return constant
-    }
-    constantSelector.dependsOnOwnProps = false
-    return constantSelector
-  }
+    throw new Error("STUB");
 }
 
 // dependsOnOwnProps is used by createMapToPropsProxy to determine whether to pass props as args
@@ -48,9 +40,7 @@ export function wrapMapToPropsConstant(
 // therefore not reporting its length accurately..
 // TODO Can this get pulled out so that we can subscribe directly to the store if we don't need ownProps?
 function getDependsOnOwnProps(mapToProps: MapToProps) {
-  return mapToProps.dependsOnOwnProps
-    ? Boolean(mapToProps.dependsOnOwnProps)
-    : mapToProps.length !== 1
+    throw new Error("STUB");
 }
 
 // Used by whenMapStateToPropsIsFunction and whenMapDispatchToPropsIsFunction,
@@ -69,42 +59,5 @@ export function wrapMapToPropsFunc<P extends AnyProps = AnyProps>(
   mapToProps: MapToProps,
   methodName: string,
 ) {
-  return function initProxySelector(
-    dispatch: Dispatch,
-    { displayName }: { displayName: string },
-  ) {
-    const proxy = function mapToPropsProxy(
-      stateOrDispatch: StateOrDispatch,
-      ownProps?: P,
-    ): MapToProps {
-      return proxy.dependsOnOwnProps
-        ? proxy.mapToProps(stateOrDispatch, ownProps)
-        : proxy.mapToProps(stateOrDispatch, undefined)
-    }
-
-    // allow detectFactoryAndVerify to get ownProps
-    proxy.dependsOnOwnProps = true
-
-    proxy.mapToProps = function detectFactoryAndVerify(
-      stateOrDispatch: StateOrDispatch,
-      ownProps?: P,
-    ): MapToProps {
-      proxy.mapToProps = mapToProps
-      proxy.dependsOnOwnProps = getDependsOnOwnProps(mapToProps)
-      let props = proxy(stateOrDispatch, ownProps)
-
-      if (typeof props === 'function') {
-        proxy.mapToProps = props
-        proxy.dependsOnOwnProps = getDependsOnOwnProps(props)
-        props = proxy(stateOrDispatch, ownProps)
-      }
-
-      if (process.env.NODE_ENV !== 'production')
-        verifyPlainObject(props, displayName, methodName)
-
-      return props
-    }
-
-    return proxy
-  }
+    throw new Error("STUB");
 }

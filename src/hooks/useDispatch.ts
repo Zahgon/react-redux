@@ -73,7 +73,7 @@ export function createDispatchHook<
   }
 
   Object.assign(useDispatch, {
-    withTypes: () => useDispatch,
+    withTypes: () => { throw new Error("STUB"); },
   })
 
   return useDispatch as UseDispatch<Dispatch<ActionType>>

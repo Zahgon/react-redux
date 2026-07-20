@@ -6,9 +6,5 @@ export default function verifyPlainObject(
   displayName: string,
   methodName: string,
 ) {
-  if (!isPlainObject(value)) {
-    warning(
-      `${methodName}() in ${displayName} must return a plain object. Instead received ${value}.`,
-    )
-  }
+    throw new Error("STUB");
 }

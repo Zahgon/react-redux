@@ -14,8 +14,7 @@ function defaultMergeProps<
   dispatchProps: TDispatchProps,
   ownProps: TOwnProps,
 ): TMergedProps {
-  // @ts-ignore
-  return { ...ownProps, ...stateProps, ...dispatchProps }
+    throw new Error("STUB");
 }
 
 function wrapMergePropsFunc<
@@ -32,34 +31,7 @@ function wrapMergePropsFunc<
     readonly areMergedPropsEqual: EqualityFn<TMergedProps>
   },
 ) => MergeProps<TStateProps, TDispatchProps, TOwnProps, TMergedProps> {
-  return function initMergePropsProxy(
-    dispatch,
-    { displayName, areMergedPropsEqual },
-  ) {
-    let hasRunOnce = false
-    let mergedProps: TMergedProps
-
-    return function mergePropsProxy(
-      stateProps: TStateProps,
-      dispatchProps: TDispatchProps,
-      ownProps: TOwnProps,
-    ) {
-      const nextMergedProps = mergeProps(stateProps, dispatchProps, ownProps)
-
-      if (hasRunOnce) {
-        if (!areMergedPropsEqual(nextMergedProps, mergedProps))
-          mergedProps = nextMergedProps
-      } else {
-        hasRunOnce = true
-        mergedProps = nextMergedProps
-
-        if (process.env.NODE_ENV !== 'production')
-          verifyPlainObject(mergedProps, displayName, 'mergeProps')
-      }
-
-      return mergedProps
-    }
-  }
+    throw new Error("STUB");
 }
 
 export function mergePropsFactory<
@@ -70,9 +42,5 @@ export function mergePropsFactory<
 >(
   mergeProps?: MergeProps<TStateProps, TDispatchProps, TOwnProps, TMergedProps>,
 ) {
-  return !mergeProps
-    ? () => defaultMergeProps
-    : typeof mergeProps === 'function'
-      ? wrapMergePropsFunc(mergeProps)
-      : createInvalidArgFactory(mergeProps, 'mergeProps')
+    throw new Error("STUB");
 }

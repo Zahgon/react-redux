@@ -56,13 +56,7 @@ const TYPE_STATICS = {
 } as const
 
 function getStatics(component: any) {
-  // React v16.11 and below
-  if (isMemo(component)) {
-    return MEMO_STATICS
-  }
-
-  // React v16.12 and above
-  return TYPE_STATICS[component['$$typeof']] || REACT_STATICS
+    throw new Error("STUB");
 }
 
 export type NonReactStatics<
@@ -98,42 +92,5 @@ export default function hoistNonReactStatics<
   targetComponent: Target,
   sourceComponent: Source,
 ): Target & NonReactStatics<Source, CustomStatic> {
-  if (typeof sourceComponent !== 'string') {
-    // don't hoist over string (html) components
-
-    if (objectPrototype) {
-      const inheritedComponent = getPrototypeOf(sourceComponent)
-      if (inheritedComponent && inheritedComponent !== objectPrototype) {
-        hoistNonReactStatics(targetComponent, inheritedComponent)
-      }
-    }
-
-    let keys: (string | symbol)[] = getOwnPropertyNames(sourceComponent)
-
-    if (getOwnPropertySymbols) {
-      keys = keys.concat(getOwnPropertySymbols(sourceComponent))
-    }
-
-    const targetStatics = getStatics(targetComponent)
-    const sourceStatics = getStatics(sourceComponent)
-
-    for (let i = 0; i < keys.length; ++i) {
-      const key = keys[i]
-      if (
-        !KNOWN_STATICS[key as keyof typeof KNOWN_STATICS] &&
-        !(sourceStatics && sourceStatics[key as keyof typeof sourceStatics]) &&
-        !(targetStatics && targetStatics[key as keyof typeof targetStatics])
-      ) {
-        const descriptor = getOwnPropertyDescriptor(sourceComponent, key)
-        try {
-          // Avoid failures from read-only properties
-          defineProperty(targetComponent, key, descriptor!)
-        } catch (e) {
-          // ignore
-        }
-      }
-    }
-  }
-
-  return targetComponent as any
+    throw new Error("STUB");
 }

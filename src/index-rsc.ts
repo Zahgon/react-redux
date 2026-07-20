@@ -14,9 +14,7 @@ const throwNotSupportedError = ((
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ...args: any[]
 ): any => {
-  throw new Error(
-    'This function is not supported in React Server Components. Please only use this export in a Client Component.',
-  )
+    throw new Error("STUB");
 }) as any
 
 export {

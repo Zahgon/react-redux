@@ -24,11 +24,7 @@ function createListenerCollection() {
 
     notify() {
       batch(() => {
-        let listener = first
-        while (listener) {
-          listener.callback()
-          listener = listener.next
-        }
+          throw new Error("STUB");
       })
     },
 
@@ -58,19 +54,7 @@ function createListenerCollection() {
       }
 
       return function unsubscribe() {
-        if (!isSubscribed || first === null) return
-        isSubscribed = false
-
-        if (listener.next) {
-          listener.next.prev = listener.prev
-        } else {
-          last = listener.prev
-        }
-        if (listener.prev) {
-          listener.prev.next = listener.next
-        } else {
-          first = listener.next
-        }
+          throw new Error("STUB");
       }
     },
   }
@@ -91,7 +75,7 @@ export interface Subscription {
 
 const nullListeners = {
   notify() {},
-  get: () => [],
+  get: () => { throw new Error("STUB"); },
 } as unknown as ListenerCollection
 
 export function createSubscription(store: any, parentSub?: Subscription) {
@@ -112,11 +96,7 @@ export function createSubscription(store: any, parentSub?: Subscription) {
     // cleanup nested sub
     let removed = false
     return () => {
-      if (!removed) {
-        removed = true
-        cleanupListener()
-        tryUnsubscribe()
-      }
+        throw new Error("STUB");
     }
   }
 
@@ -125,13 +105,11 @@ export function createSubscription(store: any, parentSub?: Subscription) {
   }
 
   function handleChangeWrapper() {
-    if (subscription.onStateChange) {
-      subscription.onStateChange()
-    }
+      throw new Error("STUB");
   }
 
   function isSubscribed() {
-    return selfSubscribed
+      throw new Error("STUB");
   }
 
   function trySubscribe() {
@@ -156,17 +134,11 @@ export function createSubscription(store: any, parentSub?: Subscription) {
   }
 
   function trySubscribeSelf() {
-    if (!selfSubscribed) {
-      selfSubscribed = true
-      trySubscribe()
-    }
+      throw new Error("STUB");
   }
 
   function tryUnsubscribeSelf() {
-    if (selfSubscribed) {
-      selfSubscribed = false
-      tryUnsubscribe()
-    }
+      throw new Error("STUB");
   }
 
   const subscription: Subscription = {
@@ -176,7 +148,7 @@ export function createSubscription(store: any, parentSub?: Subscription) {
     isSubscribed,
     trySubscribe: trySubscribeSelf,
     tryUnsubscribe: tryUnsubscribeSelf,
-    getListeners: () => listeners,
+    getListeners: () => { throw new Error("STUB"); },
   }
 
   return subscription

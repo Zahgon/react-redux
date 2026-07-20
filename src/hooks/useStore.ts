@@ -99,7 +99,7 @@ export function createStoreHook<
   }
 
   Object.assign(useStore, {
-    withTypes: () => useStore,
+    withTypes: () => { throw new Error("STUB"); },
   })
 
   return useStore as UseStore<Store<StateType, ActionType>>

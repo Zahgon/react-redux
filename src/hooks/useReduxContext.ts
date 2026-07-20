@@ -11,15 +11,7 @@ import type { ReactReduxContextValue } from '../components/Context'
  */
 export function createReduxContextHook(context = ReactReduxContext) {
   return function useReduxContext(): ReactReduxContextValue {
-    const contextValue = React.useContext(context)
-
-    if (process.env.NODE_ENV !== 'production' && !contextValue) {
-      throw new Error(
-        'could not find react-redux context value; please ensure the component is wrapped in a <Provider>',
-      )
-    }
-
-    return contextValue!
+      throw new Error("STUB");
   }
 }
 
